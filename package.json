@@ -1,0 +1,40 @@
+{
+  "name": "package-name",
+  "version": "0.9.0",
+  "description": "",
+  "keywords": [],
+  "repository": "",
+  "author": "Pavel Grinchenko <psdcoder@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "dist/*",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "examples": "vite ./examples --open",
+    "lint": "pnpm --parallel /^lint:*/",
+    "lint:oxlint": "oxlint",
+    "lint:prettier": "prettier --check .",
+    "format": "prettier . --write",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "packageManager": "pnpm@10.8.1",
+  "devDependencies": {
+    "oxlint": "^0.16.6",
+    "prettier": "^3.5.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.1",
+    "vitest": "^3.1.1"
+  }
+}
