@@ -1,0 +1,15 @@
+{
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@psdcoder/typed-channel",
+  "version": "0.9.1",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./transports/eventTarget.ts": "./src/transports/eventTarget.ts",
+    "./transports/postMessage.ts": "./src/transports/postMessage.ts"
+  },
+  "publish": {
+    "include": ["src/**/*.ts", "package.json", "README.md", "LICENSE"],
+    "exclude": ["src/**/*.test.ts"]
+  }
+}

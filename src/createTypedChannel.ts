@@ -1,4 +1,10 @@
-import type { CleanupFunction, AnyMessages, TypedChannelTransport, Message } from "./types";
+import type {
+  CleanupFunction,
+  AnyMessages,
+  TypedChannelTransport,
+  Message,
+  TypedChannel,
+} from "./types";
 
 export function createTypedChannel<
   InboundMessages extends AnyMessages,
@@ -7,7 +13,7 @@ export function createTypedChannel<
   transport:
     | TypedChannelTransport<InboundMessages, OutboundMessages>
     | TypedChannelTransport<InboundMessages, OutboundMessages>[],
-) {
+): TypedChannel<InboundMessages, OutboundMessages> {
   const transports = Array.isArray(transport) ? transport : [transport];
   const handlersByMessageType = {} as {
     [K in keyof InboundMessages]?: ((payload: InboundMessages[K]) => void)[];
