@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "demo": "deno run main.ts"
+  },
+  "imports": {
+    "typed-channel": "jsr:@psdcoder/typed-channel@0.9.3"
+  }
+}

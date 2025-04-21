@@ -1,0 +1,16 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@psdcoder/typed-channel@0.9.3": "0.9.3"
+  },
+  "jsr": {
+    "@psdcoder/typed-channel@0.9.3": {
+      "integrity": "cbac84109e5523860a9a6ea6aff11a9d95faa5ba0e3ae0d20bcec3958cb04631"
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@psdcoder/typed-channel@0.9.3"
+    ]
+  }
+}
