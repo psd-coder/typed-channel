@@ -1,0 +1,31 @@
+name: Publish new versions to registries
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+" # Match semantic version tags (e.g. 1.2.3)
+env:
+  CI_RUN: true
+jobs:
+  publish-jsr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-runner
+      - run: pnpm dlx jsr publish
+  publish-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-runner
+      - run: pnpm build
+      - run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: pnpm publish --no-git-checks
