@@ -32,6 +32,7 @@ yarn add typed-channel
 - Communication between main thread and Web Workers
 - Cross-frame communication using postMessage
 - Communication between different parts of your application via events
+- Any other event-based communication
 
 ## Usage
 
@@ -134,12 +135,12 @@ import { createTypedChannel } from "typed-channel";
 import { createEventTargetTransport } from "typed-channel/transports/eventTarget";
 import { createPostMessageTransport } from "typed-channel/transports/postMessage";
 
+const broadcastChannel = new BroadcastChannel("example-channel");
+const broadcastTransport = createPostMessageTransport<Messages>(broadcastChannel);
 const localTransport = createEventTargetTransport<Messages>();
-const worker = new Worker("./worker.js");
-const workerTransport = createPostMessageTransport<Messages>(worker);
 
-// Messages will be sent to both transports
-const channel = createTypedChannel([localTransport, workerTransport]);
+// Messages will be sent to all tabs, including current one
+const channel = createTypedChannel([localTransport, broadcastTransport]);
 ```
 
 ## Available Transports
@@ -161,7 +162,7 @@ const transport = createEventTargetTransport(customTarget);
 
 ### PostMessage Transport
 
-For communication with Workers, iframes, or other window contexts.
+For communication with Workers, iframes, or other such contexts.
 
 ```typescript
 import { createPostMessageTransport } from "typed-channel/transports/postMessage";

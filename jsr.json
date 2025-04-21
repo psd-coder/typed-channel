@@ -4,9 +4,7 @@
   "version": "0.9.3",
   "license": "MIT",
   "exports": {
-    ".": "./src/index.ts",
-    "./transports/eventTarget.ts": "./src/transports/eventTarget.ts",
-    "./transports/postMessage.ts": "./src/transports/postMessage.ts"
+    ".": "./src/index.ts"
   },
   "publish": {
     "include": ["src/**/*.ts", "package.json", "README.md", "LICENSE"],

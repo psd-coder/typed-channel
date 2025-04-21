@@ -24,10 +24,7 @@
   ],
   "type": "module",
   "sideEffects": false,
-  "exports": {
-    ".": "./dist/index.js",
-    "./transports/*": "./dist/transports/*.js"
-  },
+  "module": "./dist/index.js",
   "scripts": {
     "build": "tsup",
     "examples": "vite ./examples --open",
