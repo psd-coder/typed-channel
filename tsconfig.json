@@ -29,5 +29,6 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "examples"]
+  "include": ["src", "examples"],
+  "exclude": ["examples/DenoEventTarget", "examples/NodeEventEmitter"]
 }
