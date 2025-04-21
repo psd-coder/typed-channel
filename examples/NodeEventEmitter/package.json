@@ -1,0 +1,14 @@
+{
+  "name": "typed-channel-node-demo",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "demo": "tsx main.ts"
+  },
+  "dependencies": {
+    "typed-channel": "^0.9.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3"
+  }
+}
