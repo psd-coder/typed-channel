@@ -1,9 +1,19 @@
 {
-  "name": "package-name",
-  "version": "0.9.0",
-  "description": "",
-  "keywords": [],
-  "repository": "",
+  "name": "typed-channel",
+  "version": "0.9.1",
+  "description": "A type-safe communication channel for sending and receiving messages between different contexts in a TypeScript environment",
+  "keywords": [
+    "typed",
+    "types",
+    "typescript",
+    "channel",
+    "transport",
+    "communication",
+    "events",
+    "worker",
+    "postmessage"
+  ],
+  "repository": "psd-coder/typed-channel",
   "author": "Pavel Grinchenko <psdcoder@gmail.com>",
   "license": "MIT",
   "files": [
@@ -15,7 +25,8 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./transports/*": "./dist/transports/*.js"
   },
   "scripts": {
     "build": "tsup",
