@@ -6,6 +6,17 @@ import type {
   TypedChannel,
 } from "./types";
 
+/**
+ * Creates a typed communication channel that can send and receive strongly-typed messages.
+ * This is useful for creating a strongly-typed API for communication between different parts of an application, such as between a main thread and a web worker, or between different components in a framework.
+ * Can be unidirectional or bidirectional, depending on the transport interfaces used. To make it unidirectional, just pass the same message types for both inbound and outbound messages.
+ * Can work either one or multiple transports. If multiple transports are passed, the channel will send messages to all of them and listen for incoming messages from all of them.
+ *
+ * @template InboundMessages - The message types this channel can receive
+ * @template OutboundMessages - The message types this channel can send
+ * @param transport - One or more transport interfaces to use for message passing
+ * @returns A typed channel instance with methods to send and receive messages
+ */
 export function createTypedChannel<
   InboundMessages extends AnyMessages,
   OutboundMessages extends AnyMessages,
