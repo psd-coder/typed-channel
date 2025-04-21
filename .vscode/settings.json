@@ -1,0 +1,7 @@
+{
+  "deno.enable": true,
+  "deno.enablePaths": ["examples/DenoEventTarget"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  }
+}
