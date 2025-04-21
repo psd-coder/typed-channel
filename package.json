@@ -24,7 +24,7 @@
   ],
   "type": "module",
   "sideEffects": false,
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsup",
     "examples": "vite ./examples --open",
