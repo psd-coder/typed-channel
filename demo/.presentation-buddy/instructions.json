@@ -1,0 +1,313 @@
+[
+  {
+    "type": "createFile",
+    "path": "src/README.md"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "# Typed Channel demo",
+      "",
+      "This is a simple example of using typed channel for communication between the main thread and the worker.",
+      "1. We setup types for the messages that will be sent between the client and the worker.",
+      "2. We implement the worker code",
+      "3. We implement the main thread code"
+    ]
+  },
+  {
+    "type": "wait",
+    "delay": 2500
+  },
+  {
+    "type": "createFile",
+    "path": "src/types.ts"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "// Let's first define the types for the messages that will be sent between the client and the worker.",
+      "// It is a simple ping-pong messages with a string payload.",
+      "",
+      "export type ClientMessages = {",
+      "  ping: string;",
+      "};",
+      "",
+      "export type WorkerMessages = {",
+      "  pong: string;",
+      "};"
+    ]
+  },
+  {
+    "type": "wait",
+    "delay": 2500
+  },
+  {
+    "type": "createFile",
+    "path": "src/worker.ts"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "// Now let's implement worker",
+      "",
+      "// First we need to create a transport instance",
+      "// In web worker we use global object as the target for the transport",
+      "// It takes inbound and outbound message types as generic parameters",
+      "// In this case ClientMessages are our inbound messages and WorkerMessages are outbound ones",
+      "const transport = createPost"
+    ]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": ["<ClientMessa"],
+    "delay": 100
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [", WorkerMessa"],
+    "delay": 100
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      ">(globalThis);",
+      "",
+      "// Then we are creating a channel using the transport.",
+      "const channel = createTypedChan"
+    ]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "(transport);",
+      "",
+      "// And finally use it to setup the message handling",
+      "// Notice that we have our inbound message type in the suggestions",
+      "// And the message type is inferred from the inbound message type as well",
+      "channel.on(\""
+    ]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": ["\", (message) => {", "  channel.emit(\""]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": ["\", `Pong from the worker: ${message}`);", "});"]
+  },
+  {
+    "type": "wait",
+    "delay": 2500
+  },
+  {
+    "type": "createFile",
+    "path": "src/client.ts"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "// Now let's implement main thread code",
+      "",
+      "// First instantiate a worker instance",
+      "const worker = new Worker(new URL(\"./worker.ts\", import.meta.url), { type: \"module\" });",
+      "",
+      "// Then create a transport instance as we did before in the worker, but now",
+      "// we are using the worker instance as the target for the transport",
+      "// It treats WorkerMessages as inbound messages and ClientMessages as outbound ones",
+      "const transport = createPost"
+    ]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": ["<WorkerMessa"],
+    "delay": 100
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [", ClientMessa"],
+    "delay": 100
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      ">(worker);",
+      "",
+      "// Create a channel using the transport.",
+      "const channel = createTypedChan"
+    ]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "(transport);",
+      "",
+      "// And finally use for communicating with the worker",
+      "// Everything is inferred properly again",
+      "channel.on(\""
+    ]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": ["\", (message) => {", "  console.info(message);", "});", ""]
+  },
+  {
+    "type": "typeText",
+    "text": ["channel.emit(\""]
+  },
+  {
+    "type": "command",
+    "command": "editor.action.triggerSuggest"
+  },
+  {
+    "type": "wait",
+    "delay": 500
+  },
+  {
+    "type": "command",
+    "command": "acceptSelectedSuggestion"
+  },
+  {
+    "type": "typeText",
+    "text": [
+      "\", \"Hello from the main thread!\");",
+      "",
+      "// Voilà! Now we have typed channel for communicating between the main thread and the worker."
+    ]
+  },
+  {
+    "type": "wait",
+    "delay": 2500
+  }
+]

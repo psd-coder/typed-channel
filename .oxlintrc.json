@@ -106,5 +106,5 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": []
+  "ignorePatterns": ["demo"]
 }

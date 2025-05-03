@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      typed-channel:
+        specifier: ^0.9.5
+        version: 0.9.5
+
+packages:
+
+  typed-channel@0.9.5:
+    resolution: {integrity: sha512-taCiroVT//iljqH0ijhcyEMhG/1IgLt+FE/LKPku+oOmx1xtkAjZ8upc8KoZKezYe/sL7sMsuAC6EHnnaXt1DA==}
+
+snapshots:
+
+  typed-channel@0.9.5: {}
