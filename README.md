@@ -12,6 +12,10 @@ A type-safe communication channel for sending and receiving messages between dif
 - ✅ Simple, lightweight API
 - ✅ Zero dependencies
 
+## Video presentation
+
+https://github.com/user-attachments/assets/d68aa980-6b95-4bff-ad12-e591842e03cb
+
 ## Installation
 
 ```bash
