@@ -3,6 +3,7 @@
 A type-safe communication channel for sending and receiving messages between different contexts in a TypeScript environment.
 
 [![npm version](https://img.shields.io/npm/v/typed-channel.svg)](https://www.npmjs.com/package/typed-channel)
+[![Bundle size](https://img.shields.io/badge/Bundle_size-from_363_B-brightgreen)](https://github.com/psd-coder/typed-channel/blob/main/.size-limit.ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Features

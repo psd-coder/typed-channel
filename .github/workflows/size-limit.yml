@@ -1,0 +1,24 @@
+name: Check bundle size
+on:
+  pull_request:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  sizecheck:
+    runs-on: ubuntu-latest
+    env:
+      CI_RUN: true
+      CI_JOB_NUMBER: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: andresz1/size-limit-action
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          package_manager: pnpm
