@@ -3,19 +3,19 @@
   "version": "0.9.5",
   "description": "A type-safe communication channel for sending and receiving messages between different contexts in a TypeScript environment",
   "keywords": [
+    "channel",
+    "communication",
+    "events",
+    "postmessage",
+    "transport",
     "typed",
     "types",
     "typescript",
-    "channel",
-    "transport",
-    "communication",
-    "events",
-    "worker",
-    "postmessage"
+    "worker"
   ],
-  "repository": "psd-coder/typed-channel",
-  "author": "Pavel Grinchenko <psdcoder@gmail.com>",
   "license": "MIT",
+  "author": "Pavel Grinchenko <psdcoder@gmail.com>",
+  "repository": "psd-coder/typed-channel",
   "files": [
     "dist/*",
     "package.json",
@@ -24,29 +24,45 @@
   ],
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./transports/eventTarget": {
+      "types": "./dist/transports/eventTarget.d.mts",
+      "default": "./dist/transports/eventTarget.mjs"
+    },
+    "./transports/postMessage": {
+      "types": "./dist/transports/postMessage.d.mts",
+      "default": "./dist/transports/postMessage.mjs"
+    }
+  },
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "examples": "vite ./examples --open",
     "lint": "pnpm --parallel /^lint:*/",
     "lint:oxlint": "oxlint",
-    "lint:prettier": "prettier --check .",
+    "lint:oxfmt": "oxfmt --check",
     "lint:size": "pnpm build && size-limit",
-    "format": "prettier . --write",
+    "format": "oxfmt --write",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "bump": "./scripts/bump.sh"
   },
-  "packageManager": "pnpm@10.8.1",
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^11.2.0",
-    "oxlint": "^0.16.6",
-    "prettier": "^3.5.3",
-    "size-limit": "^11.2.0",
-    "tsup": "^8.4.0",
-    "typescript": "^5.8.3",
-    "vite": "^6.3.1",
-    "vitest": "^3.1.1"
-  }
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@size-limit/preset-small-lib": "^12.0.1",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
+    "publint": "^0.3.18",
+    "size-limit": "^12.0.1",
+    "tsdown": "^0.21.7",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }

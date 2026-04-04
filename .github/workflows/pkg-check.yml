@@ -1,24 +1,20 @@
-name: Check bundle size
+name: Check package exports
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - "**"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  pull-requests: write
-
 jobs:
-  sizecheck:
+  pkg-check:
     runs-on: ubuntu-latest
     env:
       CI_RUN: true
-      CI_JOB_NUMBER: 1
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-runner
-      - uses: andresz1/size-limit-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: pnpm build
+      - run: pnpm exec publint
+      - run: pnpm exec attw --pack --profile esm-only
