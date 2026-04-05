@@ -50,7 +50,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "bump": "./scripts/bump.sh"
+    "bump": "./scripts/bump.sh",
+    "docs:dev": "pnpm --prefix docs dev",
+    "docs:build": "pnpm --prefix docs build"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

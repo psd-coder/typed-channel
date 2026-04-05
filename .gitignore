@@ -20,5 +20,8 @@ dist
 *.sln
 *.sw?
 
+# docs
+.astro
+
 # Build cache manifests
 *.tsbuildinfo

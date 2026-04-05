@@ -1,0 +1,28 @@
+---
+import { getCollection, render } from "astro:content";
+import { Layout, TableOfContents, PageHeading } from "@psd-coder/astro-docs-theme/components";
+import { getHref } from "@psd-coder/astro-docs-theme/utils/urls";
+
+export async function getStaticPaths() {
+  const docs = (await getCollection("docs")).sort((a, b) => a.data.order - b.data.order);
+  return docs.map((doc) => ({
+    params: { slug: doc.id === "index" ? undefined : doc.id },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const { Content, headings } = await render(doc);
+---
+
+<Layout title={doc.data.title}>
+  <TableOfContents
+    slot="sidebar"
+    headings={headings}
+    itemsSelector=".prose :is(h2, h3)[id]"
+  />
+  <article class="prose">
+    <PageHeading title={doc.data.title} href={getHref(`${doc.id === "index" ? "index" : doc.id}.md`)} />
+    <Content />
+  </article>
+</Layout>

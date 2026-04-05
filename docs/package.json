@@ -1,0 +1,25 @@
+{
+  "name": "typed-channel-docs",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^5.0.3",
+    "@psd-coder/astro-docs-theme": "github:psd-coder/astro-docs-theme#8e4f766",
+    "astro": "^6.0.8",
+    "nanostores": "^1.2.0",
+    "nanotags": "^0.14.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  }
+}
