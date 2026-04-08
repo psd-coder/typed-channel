@@ -1,6 +1,6 @@
 {
   "name": "typed-channel",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "A type-safe communication channel for sending and receiving messages between different contexts in a TypeScript environment",
   "keywords": [
     "channel",

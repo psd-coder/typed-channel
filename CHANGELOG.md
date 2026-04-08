@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.1
+
+- Add documentation site
+- Add documentation link to README and package.json homepage
+
 ## 0.10.0
 
 ### Breaking Changes
