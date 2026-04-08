@@ -6,6 +6,8 @@ A type-safe communication channel for sending and receiving messages between dif
 [![Bundle size](https://img.shields.io/badge/Bundle_size-from_363_B-brightgreen)](https://github.com/psd-coder/typed-channel/blob/main/.size-limit.ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+**[Documentation](https://psd-coder.github.io/typed-channel/)**
+
 ## Features
 
 - ✅ Full TypeScript support with type checking for messages
