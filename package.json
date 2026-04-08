@@ -13,9 +13,9 @@
     "typescript",
     "worker"
   ],
+  "homepage": "https://psd-coder.github.io/typed-channel/",
   "license": "MIT",
   "author": "Pavel Grinchenko <psdcoder@gmail.com>",
-  "homepage": "https://psd-coder.github.io/typed-channel/",
   "repository": "psd-coder/typed-channel",
   "files": [
     "dist/*",
