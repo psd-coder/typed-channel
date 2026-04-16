@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "astro": "^6.0.8",
-    "astro-pigment": "^0.10.1",
+    "astro-pigment": "^0.12.0",
     "nanostores": "^1.2.0",
     "nanotags": "^0.14.0"
   },
