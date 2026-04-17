@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none">
+  <style>
+    #arrows { fill: #1e2e2e; }
+    #crystal { fill: #466c6c; }
+    @media (prefers-color-scheme: dark) {
+      #crystal { fill: #446a6a; }
+      #arrows { fill: #a5cece; }
+    }
+  </style>
+  <path id="arrows" fill="#1e2e2e" d="M0 11v10h6v7h1l8-8h-4l-3-4 3-4h4L7 4H6v7zM32 11v10h-6v7h-1l-8-8h4l3-4-3-4h-4l8-8h1v7z"/>
+  <path id="crystal" fill="#466c6c" d="M12 14h8l1.5 2-1.5 2h-8l-1.5-2z"/>
+</svg>

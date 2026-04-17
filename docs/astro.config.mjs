@@ -15,6 +15,8 @@ export default defineConfig({
         },
         github: { user: "psd-coder", repository: "typed-channel" },
       },
+      logo: "./src/assets/logo.svg",
+      icon: "./src/assets/favicon.svg",
       author: { name: "Pavel Grinchenko", url: "https://x.com/psd_coder" },
       credits: [{ name: "Evil Martians", url: "https://evilmartians.com/" }],
     }),

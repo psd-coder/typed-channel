@@ -10,7 +10,8 @@
     "astro": "^6.0.8",
     "astro-pigment": "^0.12.0",
     "nanostores": "^1.2.0",
-    "nanotags": "^0.14.0"
+    "nanotags": "^0.14.0",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
