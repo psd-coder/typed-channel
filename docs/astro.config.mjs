@@ -3,6 +3,7 @@ import { defineConfig } from "astro/config";
 import docsTheme from "astro-pigment";
 
 export default defineConfig({
+  site: "https://typed-channel.psdcoder.dev",
   integrations: [
     docsTheme({
       project: {

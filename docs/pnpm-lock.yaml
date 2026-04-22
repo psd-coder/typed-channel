@@ -12,8 +12,8 @@ importers:
         specifier: ^6.0.8
         version: 6.1.3(@types/node@24.12.2)(rollup@4.60.1)(typescript@5.9.3)
       astro-pigment:
-        specifier: ^0.13.1
-        version: 0.13.1(astro@6.1.3(@types/node@24.12.2)(rollup@4.60.1)(typescript@5.9.3))(nanostores@1.2.0)(nanotags@0.14.0(nanostores@1.2.0))(postcss@8.5.8)(sharp@0.34.5)(typescript@5.9.3)
+        specifier: ^0.15.0
+        version: 0.15.0(astro@6.1.3(@types/node@24.12.2)(rollup@4.60.1)(typescript@5.9.3))(nanostores@1.2.0)(nanotags@0.14.0(nanostores@1.2.0))(postcss@8.5.8)(sharp@0.34.5)(typescript@5.9.3)
       nanostores:
         specifier: ^1.2.0
         version: 1.2.0
@@ -1035,8 +1035,8 @@ packages:
     resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
     hasBin: true
 
-  astro-pigment@0.13.1:
-    resolution: {integrity: sha512-JEKz31VHRG233Nc/OW4sHC/mErpwxFIp3rQpsDUtg23WVS3SuZ1x/s5QDeWmtTS5TFHhlJznaE0ZMy4KXi6u8Q==}
+  astro-pigment@0.15.0:
+    resolution: {integrity: sha512-locr1BeH6BJN12OiBhnEkRUYSbr+ZuPsYvoC7nXE9WrJD9eUCJV/tP6X3PL4ALu6XE3SFolf1sJlg4vVdbwVSg==}
     peerDependencies:
       astro: ^6.0.0
       nanostores: ^1.0.0
@@ -1269,8 +1269,8 @@ packages:
     resolution: {integrity: sha512-2QF/g9/zTaPDc3BjNcVTGoBbXBgYfMTTceLaYcFJ/W9kggFUkhxD/hMEeuLKbugyef9SqAx8cpgwlIP/jinUTA==}
     engines: {node: '>=4'}
 
-  electron-to-chromium@1.5.341:
-    resolution: {integrity: sha512-1sZTssferjgDgaqRTc0ieP+ozzpOy7LQTPTtEW3yQFn4+ORdIAZWV5BthXPyHF7YqLvFJCUPhNhdAJQYlYUgiw==}
+  electron-to-chromium@1.5.342:
+    resolution: {integrity: sha512-GTuy59SdGxYgz+HN8KwOjFAVF2gfoKEmv0PFholcvVtbI9GPDND0m6ynGX3gAKOavcHRLrcfNy0QMbHbAemYdw==}
 
   emoji-regex-xs@2.0.1:
     resolution: {integrity: sha512-1QFuh8l7LqUcKe24LsPUNzjrzJQ7pgRwp1QMcZ5MX6mFplk2zQ08NVCM84++1cveaUUYtcCYHmeFEuNg16sU4g==}
@@ -3352,7 +3352,7 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-pigment@0.13.1(astro@6.1.3(@types/node@24.12.2)(rollup@4.60.1)(typescript@5.9.3))(nanostores@1.2.0)(nanotags@0.14.0(nanostores@1.2.0))(postcss@8.5.8)(sharp@0.34.5)(typescript@5.9.3):
+  astro-pigment@0.15.0(astro@6.1.3(@types/node@24.12.2)(rollup@4.60.1)(typescript@5.9.3))(nanostores@1.2.0)(nanotags@0.14.0(nanostores@1.2.0))(postcss@8.5.8)(sharp@0.34.5)(typescript@5.9.3):
     dependencies:
       '@astrojs/mdx': 5.0.3(astro@6.1.3(@types/node@24.12.2)(rollup@4.60.1)(typescript@5.9.3))
       '@astrojs/sitemap': 3.7.2
@@ -3514,7 +3514,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.10.20
       caniuse-lite: 1.0.30001788
-      electron-to-chromium: 1.5.341
+      electron-to-chromium: 1.5.342
       node-releases: 2.0.37
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
@@ -3676,7 +3676,7 @@ snapshots:
 
   dset@3.1.4: {}
 
-  electron-to-chromium@1.5.341: {}
+  electron-to-chromium@1.5.342: {}
 
   emoji-regex-xs@2.0.1: {}
 
