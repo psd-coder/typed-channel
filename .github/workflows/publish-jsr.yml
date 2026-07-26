@@ -1,0 +1,29 @@
+# Kept in a separate file from publish.yml on purpose: npm's Trusted Publisher is
+# bound to `publish.yml`, so an OIDC token minted here is useless against npm.
+name: Publish new version to JSR
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+" # Match semantic version tags (e.g. 1.2.3)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+      # JSR publishes straight from src/, which has no external imports,
+      # so this job never installs the project's dependencies
+      - name: Publish to JSR
+        run: npx --yes jsr@0.14.3 publish
