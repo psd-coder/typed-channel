@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createTypedChannel } from "./createTypedChannel";
-import type { Message, TypedChannelTransport } from "./types";
+import type { AnyMessageOf, TypedChannelTransport } from "./types";
 
 type TestInboundMessages = {
   ready: never;
@@ -14,7 +14,7 @@ type TestOutboundMessages = {
 
 function createMockTransport() {
   const unlisten = vi.fn();
-  let messageHandler: ((message: Message<any, any>) => void) | null = null;
+  let messageHandler: ((message: AnyMessageOf<TestInboundMessages>) => void) | null = null;
 
   return {
     on: vi.fn((handler) => {
@@ -22,12 +22,12 @@ function createMockTransport() {
       return unlisten;
     }),
     emit: vi.fn(),
-    simulateMessageFromTransport: (message: Message<any, any>) => {
+    simulateMessageFromTransport: (message: AnyMessageOf<TestInboundMessages>) => {
       messageHandler?.(message);
     },
     unlisten,
   } as TypedChannelTransport<TestInboundMessages, TestOutboundMessages> & {
-    simulateMessageFromTransport: (message: Message<any, any>) => void;
+    simulateMessageFromTransport: (message: AnyMessageOf<TestInboundMessages>) => void;
     unlisten: ReturnType<typeof vi.fn>;
   };
 }
@@ -165,6 +165,50 @@ describe("createTypedChannel", () => {
     });
   });
 
+  describe("Request traffic", () => {
+    test("Should not dispatch messages that carry an rpc field", () => {
+      const channel = createTypedChannel(mockTransport);
+      const handler = vi.fn();
+
+      channel.on("ready", handler);
+      mockTransport.simulateMessageFromTransport({
+        rpc: "request",
+        id: "1",
+        type: "ready",
+        payload: undefined,
+      });
+      mockTransport.simulateMessageFromTransport({
+        rpc: "response",
+        id: "1",
+        type: "ready",
+        payload: undefined,
+      });
+      mockTransport.simulateMessageFromTransport({
+        rpc: "error",
+        id: "1",
+        type: "ready",
+        payload: { name: "Error", message: "failed" },
+      });
+      mockTransport.simulateMessageFromTransport({ rpc: "abort", id: "1", type: "ready" });
+
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    test("Should ignore a message that is not an object", () => {
+      const channel = createTypedChannel(mockTransport);
+      const handler = vi.fn();
+
+      channel.on("ready", handler);
+
+      expect(() =>
+        mockTransport.simulateMessageFromTransport(
+          "junk" as unknown as AnyMessageOf<TestInboundMessages>,
+        ),
+      ).not.toThrow();
+      expect(handler).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Multiple transports support", () => {
     test("Should receive messages from all transports", () => {
       const mockTransport2 = createMockTransport();
@@ -208,6 +252,39 @@ describe("createTypedChannel", () => {
       channel.unlisten();
       expect(mockTransport.unlisten).toHaveBeenCalled();
       expect(mockTransport2.unlisten).toHaveBeenCalled();
+    });
+  });
+
+  describe("a transport that hands over something that is not a message", () => {
+    // A transport reads whatever the peer sent. `null` used to reach a property read and throw.
+    const junk: unknown[] = [null, undefined, "text", 5, 0, "", true, false, NaN, [], Symbol("s")];
+
+    test("Should drop it instead of throwing", () => {
+      const handler = vi.fn();
+      const channel = createTypedChannel(mockTransport);
+
+      channel.on("ready", handler);
+
+      for (const value of junk) {
+        expect(() =>
+          mockTransport.simulateMessageFromTransport(value as AnyMessageOf<TestInboundMessages>),
+        ).not.toThrow();
+      }
+
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    test("Should still deliver a real message afterwards", () => {
+      const handler = vi.fn();
+      const channel = createTypedChannel(mockTransport);
+
+      channel.on("configLoading", handler);
+      mockTransport.simulateMessageFromTransport(
+        null as unknown as AnyMessageOf<TestInboundMessages>,
+      );
+      mockTransport.simulateMessageFromTransport({ type: "configLoading", payload: { a: 1 } });
+
+      expect(handler).toHaveBeenCalledWith({ a: 1 });
     });
   });
 });

@@ -5,7 +5,7 @@ module.exports = [
     name: "createTypedChannel",
     path: "dist/index.mjs",
     import: "{ createTypedChannel }",
-    limit: "254 B",
+    limit: "275 B",
   },
   {
     name: "createPostMessageTransport",
