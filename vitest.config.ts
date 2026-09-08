@@ -5,6 +5,8 @@ export default defineConfig({
     include: ["src/**/*.test.[jt]s?(x)"],
     environment: "jsdom",
     typecheck: {
+      enabled: true,
+      include: ["src/**/*.test-d.ts"],
       tsconfig: "./tsconfig.json",
     },
   },
