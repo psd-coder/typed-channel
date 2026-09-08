@@ -128,7 +128,7 @@ export type AnyRequests = Record<string, AnyRequest>;
 /**
  * Turns every request that may be called without params into an error message, so a map with
  * such a request fails to compile. `RequestHandler` gives a request without params a handler
- * that takes the signal alone, so a request that may be called either way has no handler shape.
+ * that takes the context alone, so a request that may be called either way has no handler shape.
  * @template Requests - The request map to check.
  */
 export type ValidRequests<Requests extends AnyRequests> = {
@@ -166,14 +166,20 @@ export type RequestArgs<Request extends AnyRequest> =
     : [params: Parameters<Request>[0], options?: RequestOptions];
 
 /**
- * The handler `handle` takes. It always receives an `AbortSignal` last, and the request params
+ * What the channel hands a request handler on every call. `RequestOptions` travels the other
+ * way, from the caller into `request`, so the two stay separate types.
+ */
+export type RequestContext = { signal: AbortSignal };
+
+/**
+ * The handler `handle` takes. It always receives the context last, and the request params
  * first when the request declares them.
  * @template Request - The request signature from the request map.
  */
 export type RequestHandler<Request extends AnyRequest> = (
   ...args: Parameters<Request> extends []
-    ? [signal: AbortSignal]
-    : [params: Parameters<Request>[0], signal: AbortSignal]
+    ? [context: RequestContext]
+    : [params: Parameters<Request>[0], context: RequestContext]
 ) => ReturnType<Request> | Promise<ReturnType<Request>>;
 
 /**

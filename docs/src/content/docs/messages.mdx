@@ -1,0 +1,121 @@
+---
+title: "Messages"
+description: Define a message map, create a typed channel over a transport, and send and receive messages with full type checking.
+order: 2
+menu: "docs"
+---
+
+A message is one-way: you send it and nobody answers. `createTypedChannel` is the factory for
+messages. It gives you `emit` to send one and `on` to receive one, both checked against the
+message map you declare.
+
+## Step 1: Define your message types
+
+```typescript
+// Define the messages that can be sent through the channel
+type Messages = {
+  // Message name : payload type
+  notify: { message: string };
+  clear: never; // Use 'never' for messages with no payload
+};
+```
+
+## Step 2: Choose a transport
+
+```typescript
+import { createTypedChannel } from "typed-channel";
+import { createEventTargetTransport } from "typed-channel/transports/eventTarget";
+
+// Create a transport appropriate for your use case
+const transport = createEventTargetTransport<Messages>();
+// Create the channel with your type definitions
+const channel = createTypedChannel(transport);
+```
+
+[Transports](/transports) lists the ones that ship with the library, and shows how to write
+your own.
+
+## Step 3: Send and receive messages
+
+```typescript
+// Type-safe event handling
+const unsubscribeNotify = channel.on("notify", ({ message }) => {
+  console.log(`Received notification with message: ${message}`);
+});
+const unsubscribeClear = channel.on("clear", () => {
+  console.clear();
+});
+
+// Type-safe event emission
+channel.emit("notify", { message: "Application is ready" });
+setTimeout(() => {
+  channel.emit("clear");
+  // Remove all listeners
+  unsubscribeNotify();
+  unsubscribeClear();
+}, 1000);
+```
+
+## Unidirectional vs Bidirectional Transports
+
+Transports can be configured in two ways:
+
+- **Unidirectional**: Same message types in both directions
+- **Bidirectional**: Different message types for incoming and outgoing communications
+
+Unidirectional transports are ideal for event buses within the same context, while bidirectional transports excel when communicating between different contexts (like main thread and worker).
+
+Here's how to use both approaches:
+
+```typescript
+// Unidirectional: Same message types for both directions (default)
+const uniTransport = createEventTargetTransport<{ start: never; stop: never }>();
+
+// Can receive and emit the same set of messages
+uniTransport.on("start", () => {});
+uniTransport.on("stop", () => {});
+uniTransport.emit("start");
+uniTransport.emit("stop");
+
+// Bidirectional: Different message types for inbound and outbound
+type InboundMessages = {
+  status: { code: number; message: string };
+  data: { items: unknown[] };
+};
+
+type OutboundMessages = {
+  fetch: { id: string };
+  cancel: never;
+};
+
+// Explicitly defining different types for incoming and outgoing messages
+const biTransport = createPostMessageTransport<InboundMessages, OutboundMessages>(worker);
+
+// Can receive only inbound messages
+biTransport.on("status", ({ code, message }) => {});
+biTransport.on("data", ({ items }) => {});
+
+// Can emit only outbound messages
+biTransport.emit("fetch", { id: "123" });
+biTransport.emit("cancel");
+```
+
+## Multiple Transports
+
+You can combine multiple transports to send messages to different targets:
+
+```typescript
+import { createTypedChannel } from "typed-channel";
+import { createEventTargetTransport } from "typed-channel/transports/eventTarget";
+import { createPostMessageTransport } from "typed-channel/transports/postMessage";
+
+const broadcastChannel = new BroadcastChannel("example-channel");
+const broadcastTransport = createPostMessageTransport<Messages>(broadcastChannel);
+const localTransport = createEventTargetTransport<Messages>();
+
+// Messages will be sent to all tabs, including current one
+const channel = createTypedChannel([localTransport, broadcastTransport]);
+```
+
+`createTypedRpcChannel` takes a single transport instead of a list, because a request goes to
+one place and its answer comes back from there. See [Requests](/requests).

@@ -7,6 +7,7 @@
  *
  * - Full TypeScript support with type checking for messages
  * - Multiple transport implementations (EventTarget, PostMessage, your custom transport)
+ * - Request/response with abort and timeout
  * - Simple, lightweight API
  * - Zero dependencies
  *
@@ -74,10 +75,47 @@
  * const channel = createTypedChannel([localTransport, broadcastTransport]);
  * ```
  *
+ * ## Requests
+ *
+ * A request is a message the sender waits on: exactly one response, or a failure, comes back
+ * for it. `createTypedRpcChannel` adds `request` and `handle` next to `emit` and `on`:
+ *
+ * ```typescript
+ * import { createTypedRpcChannel, requests } from "typed-channel";
+ * import { createPostMessageTransport } from "typed-channel/transports/postMessage";
+ *
+ * // Requests the worker answers, and nothing in the other direction
+ * type WorkerRequests = { compute: (params: { steps: number }) => number };
+ * type NoRequests = Record<never, never>;
+ *
+ * const transport = createPostMessageTransport<Messages>(worker);
+ * // First map: what this side handles. Second map: what it calls on the peer.
+ * const channel = createTypedRpcChannel(transport, requests<NoRequests, WorkerRequests>());
+ *
+ * // Wait for the response, and stop waiting after 5 seconds
+ * const total = await channel.request(
+ *   "compute",
+ *   { steps: 6 },
+ *   { signal: AbortSignal.timeout(5000) },
+ * );
+ * ```
+ *
+ * The worker side swaps the two maps and answers the request:
+ *
+ * ```typescript
+ * const channel = createTypedRpcChannel(transport, requests<WorkerRequests, NoRequests>());
+ *
+ * channel.handle("compute", ({ steps }, { signal }) => runSteps(steps, signal));
+ * ```
+ *
+ * A request with no handler on the other side ends only through its `signal`, so pass a
+ * timeout signal when the peer may be missing.
+ *
  * @module typed-channel
  */
 
 export { createTypedChannel } from "./createTypedChannel";
+export { createTypedRpcChannel, requests } from "./createTypedRpcChannel";
 export { createEventTargetTransport } from "./transports/eventTarget";
 export { createPostMessageTransport } from "./transports/postMessage";
 export * from "./types";

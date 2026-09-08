@@ -3,15 +3,16 @@
 A type-safe communication channel for sending and receiving messages between different contexts in a TypeScript environment.
 
 [![npm version](https://img.shields.io/npm/v/typed-channel.svg)](https://www.npmjs.com/package/typed-channel)
-[![Bundle size](https://img.shields.io/badge/Bundle_size-from_363_B-brightgreen)](https://github.com/psd-coder/typed-channel/blob/main/.size-limit.ts)
+[![Bundle size](https://img.shields.io/badge/Bundle_size-from_341_B-brightgreen)](https://github.com/psd-coder/typed-channel/blob/main/.size-limit.ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**[Documentation](https://typed-channel.psdcoder.dev/)**
+**[Documentation](https://typed-channel.psdcoder.dev/)**: [Messages](https://typed-channel.psdcoder.dev/messages), [Requests](https://typed-channel.psdcoder.dev/requests), [Transports](https://typed-channel.psdcoder.dev/transports)
 
 ## Features
 
 - ✅ Full TypeScript support with type checking for messages
 - ✅ Multiple transport implementations (EventTarget, PostMessage, your own custom implementation)
+- ✅ Request/response with abort and timeout
 - ✅ Simple, lightweight API
 - ✅ Zero dependencies
 
@@ -150,6 +151,63 @@ const localTransport = createEventTargetTransport<Messages>();
 const channel = createTypedChannel([localTransport, broadcastTransport]);
 ```
 
+## Requests
+
+A message is one-way. A request is a message the sender waits on: exactly one response, or a
+failure, comes back for it. Requests come from a separate factory, `createTypedRpcChannel`,
+which adds `request` and `handle` next to `emit` and `on`.
+
+```typescript
+// shared.ts: requests the worker answers, and nothing in the other direction
+export type WorkerRequests = {
+  compute: (params: { steps: number }) => number;
+};
+
+export type NoRequests = Record<never, never>;
+
+// Messages still travel through the same channel
+export type Messages = { progress: { done: number } };
+```
+
+```typescript
+// page.ts
+import { createTypedRpcChannel, requests } from "typed-channel";
+import { createPostMessageTransport } from "typed-channel/transports/postMessage";
+import type { Messages, NoRequests, WorkerRequests } from "./shared";
+
+const transport = createPostMessageTransport<Messages>(worker);
+// First map: what this side handles. Second map: what it calls on the peer.
+const channel = createTypedRpcChannel(transport, requests<NoRequests, WorkerRequests>());
+
+// Wait for the response, and stop waiting after 5 seconds
+const total = await channel.request("compute", { steps: 6 }, { signal: AbortSignal.timeout(5000) });
+```
+
+```typescript
+// worker.ts
+const channel = createTypedRpcChannel(transport, requests<WorkerRequests, NoRequests>());
+
+channel.handle("compute", ({ steps }, { signal }) => runSteps(steps, signal));
+```
+
+A request with no handler on the other side gets no response: it ends only through its `signal`.
+Always pass a timeout signal when the peer may be missing.
+
+Read the [Requests page](https://typed-channel.psdcoder.dev/requests) for the full API: abort propagation, the rules list and the wire format.
+
+### Why two factories
+
+Requests cost code: ids, a pending map, abort handling, error rebuilding. Two factories keep that code out of the bundle of a project that only sends messages. Minified and compressed with brotli:
+
+| Import                                              | Size  |
+| --------------------------------------------------- | ----- |
+| `createTypedChannel`                                | 271 B |
+| `createTypedRpcChannel` + `requests`                | 994 B |
+| both together                                       | 997 B |
+| `createTypedChannel` + `createPostMessageTransport` | 341 B |
+
+Both factories share the same core, so adding `createTypedChannel` next to `createTypedRpcChannel` costs 3 B. Pick the factory per channel, by what that channel needs.
+
 ## Available Transports
 
 ### EventTarget Transport
@@ -203,20 +261,56 @@ Here's a simple example of a custom transport structure:
 ```typescript
 import { type AnyMessageOf, type AnyMessages, type TypedChannelTransport } from "typed-channel";
 
-function createNewTransport<Messages extends AnyMessages>(): TypedChannelTransport<Messages> {
-  // implementation details
+function createNewTransport<
+  InboundMessages extends AnyMessages,
+  OutboundMessages extends AnyMessages,
+>(source: EventTarget): TypedChannelTransport<InboundMessages, OutboundMessages> {
   function on(handler: (message: AnyMessageOf<InboundMessages>) => void) {
-    handler(messageFromSomeSource); // call handler with message data coming from transport
-    return () => {}; // return cleanup function
+    // call the handler with every message coming from the transport
+    const listener = (event: Event) => {
+      handler((event as CustomEvent<AnyMessageOf<InboundMessages>>).detail);
+    };
+
+    source.addEventListener("message", listener);
+
+    // return a cleanup function
+    return () => source.removeEventListener("message", listener);
   }
 
-  function emit(message: AnyMessageOf<Messages>) {
-    // pass emitted message to the transport
+  function emit(message: AnyMessageOf<OutboundMessages>) {
+    // pass the emitted message to the transport
+    source.dispatchEvent(new CustomEvent("message", { detail: message }));
   }
 
   return { on, emit };
 }
 ```
+
+`AnyMessageOf<T>` now covers request traffic as well as the typed messages of `T`, so a
+transport that spells the message union by hand no longer fits the contract. Use
+`AnyMessageOf` and the transport keeps working.
+
+A transport that only forwards the object as-is needs no change. One that inspects messages
+must narrow with `"rpc" in message` before it reads `type` as a message name:
+
+```typescript
+function on(handler: (message: AnyMessageOf<Messages>) => void) {
+  return subscribe((message) => {
+    if ("rpc" in message) {
+      // request traffic: forward it untouched
+      handler(message);
+
+      return;
+    }
+
+    console.log(`message ${message.type}`);
+    handler(message);
+  });
+}
+```
+
+`in` throws on a value that is not an object, and so does reading `message.rpc`. A transport
+that can receive those must check `typeof message === "object" && message !== null` first.
 
 ### Advanced Example: Figma Plugin Communication
 
@@ -283,6 +377,9 @@ You can find more examples in the [examples directory](./examples):
 - [EventTarget Example](./examples/EventTarget)
 - [Worker Example](./examples/Worker)
 - [BroadcastChannel Example](./examples/BroadcastChannel)
+- [EventTarget Requests Example](./examples/EventTargetRequests)
+- [Worker Requests Example](./examples/WorkerRequests)
+- [BroadcastChannel Requests Example](./examples/BroadcastChannelRequests)
 
 ## License
 
