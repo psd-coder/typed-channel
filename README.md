@@ -6,7 +6,7 @@ A type-safe communication channel for sending and receiving messages between dif
 [![Bundle size](https://img.shields.io/badge/Bundle_size-from_363_B-brightgreen)](https://github.com/psd-coder/typed-channel/blob/main/.size-limit.ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**[Documentation](https://psd-coder.github.io/typed-channel/)**
+**[Documentation](https://typed-channel.psdcoder.dev/)**
 
 ## Features
 
@@ -72,17 +72,17 @@ const channel = createTypedChannel(transport);
 
 ```typescript
 // Type-safe event handling
-const unsubscribeNotify = eventEmitter.on("notify", ({ message }) => {
+const unsubscribeNotify = channel.on("notify", ({ message }) => {
   console.log(`Received notification with message: ${message}`);
 });
-const unsubscribeClear = eventEmitter.on("clear", () => {
+const unsubscribeClear = channel.on("clear", () => {
   console.clear();
 });
 
 // Type-safe event emission
-eventEmitter.emit("notify", { message: "Application is ready" });
+channel.emit("notify", { message: "Application is ready" });
 setTimeout(() => {
-  eventEmitter.emit("clear");
+  channel.emit("clear");
   // Remove all listeners
   unsubscribeNotify();
   unsubscribeClear();
@@ -223,7 +223,6 @@ function createNewTransport<Messages extends AnyMessages>(): TypedChannelTranspo
 Here's a real-world example of custom transport for Figma plugin UI communication:
 
 ```typescript
-import type { PluginMessages, UIMessages } from "./types";
 import {
   type AnyMessageOf,
   type AnyMessages,
