@@ -6,7 +6,7 @@ A type-safe communication channel for sending and receiving messages between dif
 [![Bundle size](https://img.shields.io/badge/Bundle_size-from_341_B-brightgreen)](https://github.com/psd-coder/typed-channel/blob/main/.size-limit.ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**[Documentation](https://typed-channel.psdcoder.dev/)**: [Messages](https://typed-channel.psdcoder.dev/messages), [Requests](https://typed-channel.psdcoder.dev/requests), [Transports](https://typed-channel.psdcoder.dev/transports)
+**[Documentation](https://typed-channel.psdcoder.dev/)**: [Messages](https://typed-channel.psdcoder.dev/guides/messages), [Requests](https://typed-channel.psdcoder.dev/guides/requests), [Transports](https://typed-channel.psdcoder.dev/guides/transports)
 
 ## Features
 
@@ -193,7 +193,7 @@ channel.handle("compute", ({ steps }, { signal }) => runSteps(steps, signal));
 A request with no handler on the other side gets no response: it ends only through its `signal`.
 Always pass a timeout signal when the peer may be missing.
 
-Read the [Requests page](https://typed-channel.psdcoder.dev/requests) for the full API: abort propagation, the rules list and the wire format.
+Read the [Requests page](https://typed-channel.psdcoder.dev/guides/requests) for the full API: abort propagation, the rules list and the wire format.
 
 ### Why two factories
 

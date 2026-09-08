@@ -1,8 +1,8 @@
 ---
 title: "Messages"
 description: Define a message map, create a typed channel over a transport, and send and receive messages with full type checking.
-order: 2
-menu: "docs"
+order: 3
+menu: "guides"
 ---
 
 A message is one-way: you send it and nobody answers. `createTypedChannel` is the factory for
@@ -32,7 +32,7 @@ const transport = createEventTargetTransport<Messages>();
 const channel = createTypedChannel(transport);
 ```
 
-[Transports](/transports) lists the ones that ship with the library, and shows how to write
+[Transports](/guides/transports) lists the ones that ship with the library, and shows how to write
 your own.
 
 ## Step 3: Send and receive messages
@@ -118,4 +118,4 @@ const channel = createTypedChannel([localTransport, broadcastTransport]);
 ```
 
 `createTypedRpcChannel` takes a single transport instead of a list, because a request goes to
-one place and its answer comes back from there. See [Requests](/requests).
+one place and its answer comes back from there. See [Requests](/guides/requests).
