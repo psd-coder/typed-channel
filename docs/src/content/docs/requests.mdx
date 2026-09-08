@@ -1,0 +1,197 @@
+---
+title: "Requests"
+description: Send a request through a typed channel, answer it on the other side, and stop it with a timeout or an abort signal.
+order: 3
+menu: "docs"
+---
+
+A message is one-way: you send it and nobody answers. A request is a message the sender waits
+on. Exactly one response, or a failure, comes back for it.
+
+Requests live in a separate factory, `createTypedRpcChannel`. It gives you `request` and
+`handle` next to the `emit` and `on` you already know, so one channel carries both kinds of
+traffic.
+
+## Setup
+
+A request map describes requests as functions: the params are the function's single parameter,
+the response is its return type.
+
+```typescript
+import { createTypedRpcChannel, requests } from "typed-channel";
+import { createPostMessageTransport } from "typed-channel/transports/postMessage";
+
+// Requests the worker answers
+type WorkerRequests = {
+  compute: (params: { steps: number }) => number;
+  ping: () => string;
+};
+
+// Requests this page answers
+type ClientRequests = {
+  confirm: (question: string) => boolean;
+};
+
+// Messages still travel through the same channel
+type Messages = {
+  progress: { done: number };
+};
+
+const worker = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
+const transport = createPostMessageTransport<Messages>(worker);
+
+// First map: what this side handles. Second map: what it calls on the peer.
+const channel = createTypedRpcChannel(transport, requests<ClientRequests, WorkerRequests>());
+```
+
+`requests<Handled, Called>()` is a type witness. It returns nothing at runtime: it exists so
+both request maps come from a single argument. `Called` defaults to `Handled`, so a channel
+that answers and calls the same requests writes `requests<AppRequests>()`.
+
+The worker side mirrors the two maps:
+
+```typescript
+const channel = createTypedRpcChannel(transport, requests<WorkerRequests, ClientRequests>());
+```
+
+A request may declare at most one parameter, and it must be a params object or a single value.
+The parameter must be required, and its type must not include `undefined`: the handler side
+reads the payload to decide how it calls the handler, so an `undefined` payload hands the
+handler the context alone. `requests<Handled, Called>()` rejects a map that breaks these rules.
+
+## Calling
+
+`request(type, params, options)` returns a promise. It resolves with what the peer's handler
+returned, and rejects when the handler throws or when the request is aborted.
+
+```typescript
+const total = await channel.request("compute", { steps: 6 });
+```
+
+The params slot is always there, so a request without params passes `undefined` when it needs
+the options:
+
+```typescript
+const controller = new AbortController();
+
+await channel.request("ping");
+await channel.request("ping", undefined, { signal: controller.signal });
+```
+
+## Handling
+
+`handle(type, handler)` registers the function that answers one request name. It returns a
+cleanup function that removes the handler.
+
+Here is the worker side, whose channel is `requests<WorkerRequests, ClientRequests>()`:
+
+```typescript
+const stopHandling = channel.handle("compute", async ({ steps }, { signal }) => {
+  let total = 0;
+
+  for (let step = 1; step <= steps; step++) {
+    await runStep(step, signal);
+    total += step;
+  }
+
+  return total;
+});
+
+stopHandling();
+```
+
+The handler always receives a context object as its last argument, and the request params
+before it when the request declares them. A request without params hands the context alone:
+
+```typescript
+channel.handle("ping", ({ signal }) => (signal.aborted ? "" : "pong"));
+```
+
+The context holds a `signal` today. It is an object so that a later version can add a field
+without changing the shape of every handler you wrote.
+
+Only one handler per request name is allowed. A second `handle` call with the same name throws.
+
+## Timeout and abort
+
+Pass a `signal` to stop a request. The platform gives you both a timeout and a manual abort,
+and `AbortSignal.any` combines them:
+
+```typescript
+const controller = new AbortController();
+const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(5000)]);
+
+try {
+  const total = await channel.request("compute", { steps: 6 }, { signal });
+
+  console.log(`total: ${total}`);
+} catch (error) {
+  // Both cases reject with signal.reason: a TimeoutError from the timeout signal,
+  // or whatever controller.abort() was given
+  console.log(`compute failed: ${String(error)}`);
+}
+
+// Somewhere else, for example on a "Stop" button click
+controller.abort();
+```
+
+The promise rejects with `signal.reason`. The abort also travels to the peer, so the handler's
+own signal aborts and that side sends nothing back.
+
+An abort goes out whenever the request stops waiting, not only when your signal fires. The
+first response also ends it, so every peer that is still working on that request stops. This
+costs one small extra message per request, even when only one peer answers.
+
+## Rules
+
+- A request with no handler on the other side, or a handler registered after the request
+  arrived, gets no response. It ends only through its `signal`, so always pass a timeout signal
+  when the peer may be missing.
+- With several peers the first response wins. Later responses for the same request, and
+  responses for a request that already ended, are dropped. The winning response also sends an
+  abort, so a peer that is still running a handler for that request stops.
+- A request channel takes one transport, not a list. A request goes to one place and its answer
+  comes back from there. A transport that reaches several peers, such as a `BroadcastChannel`,
+  still works: the rule above applies to it.
+- A handler throw becomes a rejection with a plain `Error` rebuilt from `name` and `message`.
+  Subclasses and extra fields are lost, so read `error.name` instead of `instanceof`.
+- `unlisten()` rejects every pending request with an `AbortError` `DOMException` and aborts
+  every running handler. `listen()` after that takes requests again, and the handlers you
+  registered are still in place.
+- `request()` between an `unlisten()` and the next `listen()` rejects at once with that same
+  `AbortError` `DOMException`, and nothing goes out on the transport.
+- A message and a request may share a name. They travel apart and never reach each other's
+  handlers.
+
+## Wire format
+
+Request traffic travels as a flat object with an `rpc` field:
+
+```typescript
+type RpcMessageOf<Kind extends string> = { rpc: Kind; id: string; type: string; payload?: unknown };
+
+type RpcMessage =
+  | RpcMessageOf<"request">
+  | RpcMessageOf<"response">
+  | RpcMessageOf<"error">
+  | RpcMessageOf<"abort">;
+```
+
+Every kind carries the same four fields, so one check tells real request traffic from anything
+else a transport may hand over. `id` is a random string made by the caller. `type` is the request
+name. The `rpc` field is what tells request traffic from a plain message, which is why a message
+and a request may share a name. You need this shape when you write a custom transport that
+inspects messages, or when you read the traffic in devtools.
+
+An `abort` carries no payload. An `error` carries `{ name, message }`, but the type does not
+promise it: the payload comes from the peer, so the caller rebuilds the `Error` from whatever
+arrives. A reply whose payload is missing those two fields still ends the request, with the
+built-in `"Error"` name and an empty message.
+
+## Mixing factories
+
+Both factories speak the same transport contract, so you can put a `createTypedChannel` peer on
+one end and a `createTypedRpcChannel` peer on the other. Messages then work in both directions.
+
+A plain channel ignores everything with an `rpc` field, so it never answers a request.
+Requests to such a peer end only through their `signal`.

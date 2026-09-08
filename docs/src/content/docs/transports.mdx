@@ -1,0 +1,171 @@
+---
+title: "Transports"
+description: The transports that ship with typed-channel, and how to write a custom one for any messaging API.
+order: 4
+menu: "docs"
+---
+
+A transport moves messages between two contexts. It does not know what a message means: the
+channel on top of it does. The library ships two transports and lets you write your own.
+
+## Available Transports
+
+### EventTarget Transport
+
+Uses the standard DOM `EventTarget` interface for communication.
+
+```typescript
+import { createEventTargetTransport } from "typed-channel/transports/eventTarget";
+
+// Uses a new EventTarget instance by default
+const transport = createEventTargetTransport();
+
+// Or provide your own EventTarget
+const customTarget = new EventTarget();
+const transport = createEventTargetTransport(customTarget);
+```
+
+### PostMessage Transport
+
+For communication with Workers, iframes, or other such contexts.
+
+```typescript
+import { createPostMessageTransport } from "typed-channel/transports/postMessage";
+
+// With a Worker
+const worker = new Worker("./worker.js");
+const transport = createPostMessageTransport(worker);
+
+// With an iframe
+const iframe = document.querySelector("iframe");
+const transport = createPostMessageTransport(iframe.contentWindow);
+```
+
+### BroadcastChannel Transport
+
+For communication between different tabs/windows of the same origin.
+
+```typescript
+import { createPostMessageTransport } from "typed-channel/transports/postMessage";
+
+const broadcastChannel = new BroadcastChannel("example-channel");
+const transport = createPostMessageTransport(broadcastChannel);
+```
+
+## Custom Transports
+
+You can create custom transports by implementing the `TypedChannelTransport` interface. This gives you flexibility to adapt typed-channel to any messaging system.
+
+Here's a simple example of a custom transport structure:
+
+```typescript
+import { type AnyMessageOf, type AnyMessages, type TypedChannelTransport } from "typed-channel";
+
+function createNewTransport<
+  InboundMessages extends AnyMessages,
+  OutboundMessages extends AnyMessages,
+>(source: EventTarget): TypedChannelTransport<InboundMessages, OutboundMessages> {
+  function on(handler: (message: AnyMessageOf<InboundMessages>) => void) {
+    // call the handler with every message coming from the transport
+    const listener = (event: Event) => {
+      handler((event as CustomEvent<AnyMessageOf<InboundMessages>>).detail);
+    };
+
+    source.addEventListener("message", listener);
+
+    // return a cleanup function
+    return () => source.removeEventListener("message", listener);
+  }
+
+  function emit(message: AnyMessageOf<OutboundMessages>) {
+    // pass the emitted message to the transport
+    source.dispatchEvent(new CustomEvent("message", { detail: message }));
+  }
+
+  return { on, emit };
+}
+```
+
+`AnyMessageOf<T>` now covers request traffic as well as the typed messages of `T`, so a
+transport that spells the message union by hand no longer fits the contract. Use
+`AnyMessageOf` and the transport keeps working.
+
+A transport that only forwards the object as-is needs no change. One that inspects messages
+must narrow with `"rpc" in message` before it reads `type` as a message name:
+
+```typescript
+function on(handler: (message: AnyMessageOf<Messages>) => void) {
+  return subscribe((message) => {
+    if ("rpc" in message) {
+      // request traffic: forward it untouched
+      handler(message);
+
+      return;
+    }
+
+    console.log(`message ${message.type}`);
+    handler(message);
+  });
+}
+```
+
+`in` throws on a value that is not an object, and so does reading `message.rpc`. A transport
+that can receive those must check `typeof message === "object" && message !== null` first.
+
+### Figma Plugin Communication
+
+Here's a real-world example of custom transport for Figma plugin UI communication:
+
+```typescript
+import {
+  type AnyMessageOf,
+  type AnyMessages,
+  createTypedChannel,
+  type TypedChannelTransport,
+} from "typed-channel";
+
+export type PluginMessages = {
+  ready: never;
+};
+
+export type UIMessages = {
+  "window:resize": { width: number; height: number };
+};
+
+function createFigmaUiTransport<
+  InboundMessages extends AnyMessages,
+  OutboundMessages extends AnyMessages,
+>(): TypedChannelTransport<InboundMessages, OutboundMessages> {
+  function on(handler: (message: AnyMessageOf<InboundMessages>) => void) {
+    const workerMessageHandler = (
+      e: MessageEvent<{ pluginMessage: AnyMessageOf<InboundMessages> }>,
+    ) => {
+      handler(e.data.pluginMessage);
+    };
+
+    globalThis.onmessage = workerMessageHandler;
+
+    return () => (globalThis.onmessage = null);
+  }
+
+  function emit(message: AnyMessageOf<OutboundMessages>) {
+    parent.postMessage({ pluginMessage: message }, "*");
+  }
+
+  return { on, emit };
+}
+
+// Create the transport with appropriate type parameters
+const transport = createFigmaUiTransport<PluginMessages, UIMessages>();
+
+// Create a typed communication channel using our custom transport
+export const pluginChannel = createTypedChannel(transport);
+```
+
+This example shows how to create a custom transport for Figma plugins, where:
+
+1. The `on` method wraps Figma's message handling convention (where messages arrive via `pluginMessage` property)
+2. The `emit` method sends messages to the parent frame with the proper Figma message format
+3. The transport specifies different types for inbound vs outbound messages
+
+By following these patterns, you can adapt typed-channel to work with any messaging API.

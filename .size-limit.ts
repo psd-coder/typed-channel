@@ -5,7 +5,13 @@ module.exports = [
     name: "createTypedChannel",
     path: "dist/index.mjs",
     import: "{ createTypedChannel }",
-    limit: "275 B",
+    limit: "271 B",
+  },
+  {
+    name: "createTypedRpcChannel",
+    path: "dist/index.mjs",
+    import: "{ createTypedRpcChannel, requests }",
+    limit: "994 B",
   },
   {
     name: "createPostMessageTransport",
