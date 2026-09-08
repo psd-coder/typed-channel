@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="90.62 -8.88 65.76 65.76" fill="none">
   <style>
-    #arrows { fill: #1e2e2e; }
-    #crystal { fill: #466c6c; }
+    #arrows { fill: #466c6c; }
+    #crystal { fill: #1e2e2e; }
     @media (prefers-color-scheme: dark) {
       #crystal { fill: #446a6a; }
       #arrows { fill: #a5cece; }
     }
   </style>
-  <path id="arrows" fill="#1e2e2e" d="M0 11v10h6v7h1l8-8h-4l-3-4 3-4h4L7 4H6v7zM32 11v10h-6v7h-1l-8-8h4l3-4-3-4h-4l8-8h1v7z"/>
-  <path id="crystal" fill="#466c6c" d="M12 14h8l1.5 2-1.5 2h-8l-1.5-2z"/>
+  <path id="arrows" fill="#466c6c" d="M117 18H113L109 24L113 30H117L99.0232 48V34H90.6541C90.7858 33.8769 90.9152 33.7508 91.0408 33.6201C93.2295 31.3451 94.324 28.1383 94.324 24C94.324 19.8617 93.2295 16.6654 91.0408 14.4121C90.9057 14.2703 90.7669 14.133 90.6248 14H99.0232V0L117 18ZM147 14H156.389V14.0654C156.288 14.166 156.188 14.2685 156.092 14.374C154.031 16.6232 153 19.8319 153 24C153 28.1683 153.996 31.3768 155.988 33.626C156.103 33.7544 156.221 33.8789 156.342 34H147V48L129 30H133L137 24L133 18H129L147 0V14Z"/>
+  <path id="crystal" fill="#1e2e2e" d="M131.667 20L134.334 24L131.667 28H114.333L111.666 24L114.333 20L131.667 20Z"/>
 </svg>
