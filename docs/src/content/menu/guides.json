@@ -1,0 +1,13 @@
+{
+  "groups": [
+    {
+      "label": null,
+      "items": [
+        { "title": "Overview", "href": "/guides" },
+        { "title": "Messages", "href": "/guides/messages" },
+        { "title": "Requests", "href": "/guides/requests" },
+        { "title": "Transports", "href": "/guides/transports" }
+      ]
+    }
+  ]
+}

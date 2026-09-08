@@ -1,8 +1,7 @@
 ---
-title: "Overview"
+title: "Getting started"
 description: A type-safe communication channel for sending and receiving messages between different contexts in a TypeScript environment.
 order: 1
-menu: "docs"
 ---
 
 import { InstallPackage } from "astro-pigment/components";
@@ -41,10 +40,10 @@ A type-safe communication channel for sending and receiving messages between dif
 
 ## Messages and requests
 
-The library has two factories. Both sit on the same [transports](/transports), so you pick one
+The library has two factories. Both sit on the same [transports](/guides/transports), so you pick one
 by the kind of traffic you need.
 
-`createTypedChannel` carries [messages](/messages). A message is one-way: you send it with
+`createTypedChannel` carries [messages](/guides/messages). A message is one-way: you send it with
 `emit` and receive it with `on`, and nobody answers.
 
 ```typescript
@@ -59,7 +58,7 @@ channel.on("notify", ({ message }) => console.log(message));
 channel.emit("notify", { message: "Application is ready" });
 ```
 
-`createTypedRpcChannel` adds [requests](/requests) on top. A request is a message the sender
+`createTypedRpcChannel` adds [requests](/guides/requests) on top. A request is a message the sender
 waits on: exactly one response, or a failure, comes back for it. It gives you `request` and
 `handle` next to `emit` and `on`.
 
