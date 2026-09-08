@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EventTarget requests — typed-channel</title>
+  </head>
+  <body>
+    <h1>EventTarget requests example</h1>
+    <p>
+      Two modules of the same page talk over one EventTarget. Press Load user to send a
+      <code>loadUser</code> request, press it again while it runs to abort it, or stop listening to
+      reject it with an AbortError.
+    </p>
+    <button id="load">Load user</button>
+    <button id="unlisten">Stop listening</button>
+    <button id="listen">Start listening</button>
+    <div id="log"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
