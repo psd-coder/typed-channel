@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Check if version type is provided
 if [ $# -lt 1 ]; then
@@ -8,8 +9,8 @@ fi
 
 VERSION_TYPE=$1
 
-# Use npm to bump the version in package.json (without git commit and tag)
-npm --no-git-tag-version version $VERSION_TYPE
+# Bump the version in package.json (without git commit and tag)
+pnpm version "$VERSION_TYPE" --no-git-tag-version
 
 # Get the new version from package.json
 NEW_VERSION=$(node -p "require('./package.json').version")
@@ -17,7 +18,7 @@ NEW_VERSION=$(node -p "require('./package.json').version")
 # Update jsr.json if it exists
 if [ -f "jsr.json" ]; then
   jq ".version = \"$NEW_VERSION\"" jsr.json > jsr.json.tmp && mv jsr.json.tmp jsr.json
-  prettier --write jsr.json
+  pnpm exec oxfmt --write jsr.json
   echo "Updated version in jsr.json"
 fi
 
